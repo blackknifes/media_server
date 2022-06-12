@@ -1,0 +1,142 @@
+version: "3"
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=8080
+    volumes:
+      - /mnt/sda/config/qbittorrent:/config
+      - /mnt/sda/downloads:/downloads
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    networks:
+      - raspberry
+    restart: unless-stopped
+
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - AUTO_UPDATE=true #optional
+    volumes:
+      - /mnt/sda/config/jackett:/config
+      - /mnt/sda/downloads:/downloads
+    ports:
+      - 9117:9117
+    networks:
+      - raspberry
+    restart: unless-stopped
+
+  jellyfin:
+    image: linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - JELLYFIN_PublishedServerUrl=0.0.0.0 #optional
+    volumes:
+      - /mnt/sda/config/jellyfin:/config
+      - /mnt/sda/downloads:/downloads
+      - /mnt/sda/tvseries:/data/tvseries
+      - /mnt/sda/movies:/data/movies
+      - /mnt/sda/anime:/data/anime
+      - /opt/vc/lib:/opt/vc/lib
+    devices:
+      - /dev/vcsm-cma:/dev/vcsm-cma
+      - /dev/vchiq:/dev/vchiq
+      - /dev/video10:/dev/video10
+      - /dev/video11:/dev/video11
+      - /dev/video12:/dev/video12
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+      - 7359:7359/udp #optional
+      - 1900:1900/udp #optional
+    networks:
+      - raspberry
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    volumes:
+      - /mnt/sda/config/bazarr:/config
+      - /mnt/sda/downloads:/downloads
+      - /mnt/sda/tvseries:/data/tvseries
+      - /mnt/sda/movies:/data/movies
+      - /mnt/sda/anime:/data/anime
+    ports:
+      - 6767:6767
+    networks:
+      - raspberry
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    volumes:
+      - /mnt/sda/config/radarr:/config
+      - /mnt/sda/downloads:/downloads
+      - /mnt/sda/tvseries:/data/tvseries
+      - /mnt/sda/movies:/data/movies
+      - /mnt/sda/anime:/data/anime
+    ports:
+      - 7878:7878
+    networks:
+      - raspberry
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    volumes:
+      - /mnt/sda/config/sonarr:/config
+      - /mnt/sda/downloads:/downloads
+      - /mnt/sda/tvseries:/data/tvseries
+      - /mnt/sda/movies:/data/movies
+      - /mnt/sda/anime:/data/anime
+    ports:
+      - 8989:8989
+    networks:
+      - raspberry
+    restart: unless-stopped
+
+  nginx:
+    image: linuxserver/nginx:latest
+    container_name: nginx
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    volumes:
+      - /mnt/sda/config/nginx:/etc/nginx/http.d
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - raspberry
+    restart: unless-stopped
+networks:
+  raspberry:
